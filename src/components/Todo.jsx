@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react"
+import {useRef, useState} from "react"
 import TaskItem from "./TaskItem.jsx"
 import EmptyList from "./EmptyList.jsx"
 import Footer from "./Footer.jsx"
@@ -7,7 +7,8 @@ import "./css/todo.css"
 const Todo = () => {
     const [tasks, setTasks] = useState([])
     const [filter, setFilter] = useState("all")
-    const inputRef = useRef(null)
+    const [text, setText] = useState("")
+    const inputRef = useRef(null) // only for focus
 
     const filteredTasks = tasks.filter(task => {
         if (filter === "completed") return task.completed
@@ -16,16 +17,16 @@ const Todo = () => {
     })
 
     const addTask = () => {
-        const value = inputRef.current.value
 
-        if (value) {
+        if (text) {
             setTasks(prev => [...prev, {
                 id: crypto.randomUUID(),
-                text: value,
+                text: text,
                 completed: false
             }])
 
-            inputRef.current.value = ''
+            inputRef.current?.focus();
+            setText("")
         }
     }
 
@@ -47,10 +48,6 @@ const Todo = () => {
         setTasks(prevTasks => prevTasks.filter(task => !task.completed))
     }
 
-    useEffect(() => {
-        console.log(filteredTasks)
-    }, [filteredTasks])
-
     return (
         <main className="app">
             <header className="app__header">
@@ -60,11 +57,21 @@ const Todo = () => {
             <section className="card">
                 <form className="todo-form" autoComplete="off">
                     <label className="sr-only" htmlFor="todo">New task</label>
-                    <input ref={inputRef} id="todo" className="input" placeholder="For example: learn useEffect"/>
+                    <input
+                        ref={inputRef}
+                        onChange={(e) => setText(e.target.value)}
+                        id="todo"
+                        className="input"
+                        placeholder="For example: learn useEffect"
+                        value={text}
+                    />
                     <button
                         onClick={() => addTask()}
                         className="btn btn--primary"
-                        type="button">Add task
+                        type="button"
+                        disabled={!text}
+                    >
+                        Add task
                     </button>
                 </form>
 
@@ -73,17 +80,23 @@ const Todo = () => {
                         <button
                             onClick={() => setFilter('all')}
                             className={`chip ${filter === "all" ? "chip--active" : ""}`}
-                            type="button">All
+                            type="button"
+                        >
+                            All
                         </button>
                         <button
                             onClick={() => setFilter('active')}
                             className={`chip ${filter === "active" ? "chip--active" : ""}`}
-                            type="button">Active
+                            type="button"
+                        >
+                            Active
                         </button>
                         <button
                             onClick={() => setFilter('completed')}
                             className={`chip ${filter === "completed" ? "chip--active" : ""}`}
-                            type="button">Completed
+                            type="button"
+                        >
+                            Completed
                         </button>
                     </div>
 

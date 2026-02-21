@@ -65,6 +65,29 @@
 }
 .btn--primary:hover{ background: rgba(99,102,241,.25); }
 .btn--ghost:hover{ background: rgba(255,255,255,.10); }
+.btn:disabled,
+.btn[aria-disabled="true"]{
+    cursor: not-allowed;
+    opacity: .55;
+    background: rgba(255,255,255,.03);
+    border-color: rgba(255,255,255,.10);
+    color: rgba(255,255,255,.45);
+    box-shadow: none;
+    filter: saturate(.85);
+}
+
+/* чтобы hover/active не “срабатывали” визуально */
+.btn:disabled:hover,
+.btn[aria-disabled="true"]:hover{
+    background: rgba(255,255,255,.03);
+    transform: none;
+}
+
+.btn:disabled:active,
+.btn[aria-disabled="true"]:active{
+    transform: none;
+}
+
 
 .toolbar{
     margin-top: 12px;

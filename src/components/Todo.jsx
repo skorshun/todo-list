@@ -90,7 +90,10 @@ const Todo = () => {
                     <button
                         onClick={removeCompletedTasks}
                         className="btn btn--ghost"
-                        type="button">Clear completed
+                        type="button"
+                        disabled={completedTasks.length === 0}
+                    >
+                        Clear completed
                     </button>
                 </div>
 

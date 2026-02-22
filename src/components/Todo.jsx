@@ -20,16 +20,16 @@ const Todo = () => {
         e.preventDefault()
         const value = text.trim()
 
-        if (value) {
-            setTasks(prev => [...prev, {
-                id: crypto.randomUUID(),
-                text: value,
-                completed: false
-            }])
+        if (!value) return
 
-            inputRef.current?.focus();
-            setText("")
-        }
+        setTasks(prev => [...prev, {
+            id: crypto?.randomUUID?.() ?? String(Date.now()),
+            text: value,
+            completed: false
+        }])
+
+        setText("")
+        inputRef.current?.focus();
     }
 
     const removeTaskFromList = id => setTasks(

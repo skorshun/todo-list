@@ -1,14 +1,25 @@
-import {useRef, useState} from "react"
-import TaskItem from "./TaskItem.jsx"
-import EmptyList from "./EmptyList.jsx"
+import {useState} from "react"
 import Footer from "./Footer.jsx"
 import "./css/todo.css"
+import TodoForm from "./TodoForm.jsx";
+import TodoToolbar from "./TodoToolbar.jsx";
+import TodoTaskList from "./TodoTaskList.jsx";
 
 const Todo = () => {
     const [tasks, setTasks] = useState([])
     const [filter, setFilter] = useState("all")
-    const [text, setText] = useState("")
-    const inputRef = useRef(null) // only for focus
+
+    const addTask = (value) => {
+        const text = value.trim();
+
+        if (!text) return;
+
+        setTasks(prev => [...prev, {
+            id: crypto?.randomUUID?.() ?? String(Date.now()),
+            text: text,
+            completed: false
+        }])
+    }
 
     const filteredTasks = tasks.filter(task => {
         if (filter === "completed") return task.completed
@@ -16,39 +27,20 @@ const Todo = () => {
         return true;
     })
 
-    const addTask = (e) => {
-        e.preventDefault()
-        const value = text.trim()
+    const removeTaskFromList = id =>
+        setTasks(prevTasks => prevTasks.filter(task => task.id !== id))
 
-        if (!value) return
-
-        setTasks(prev => [...prev, {
-            id: crypto?.randomUUID?.() ?? String(Date.now()),
-            text: value,
-            completed: false
-        }])
-
-        setText("")
-        inputRef.current?.focus();
-    }
-
-    const removeTaskFromList = id => setTasks(
-        prevTasks => prevTasks.filter(task => task.id !== id)
-    )
-
-    const toggleTaskStatus = id => {
+    const toggleTaskStatus = id =>
         setTasks(prevTasks =>
             prevTasks.map(task =>
                 task.id === id ? {...task, completed: !task.completed } : task
             )
         );
-    }
 
-    const completedTasks = tasks.filter(task => task.completed)
-
-    const removeCompletedTasks = () => {
+    const removeCompletedTasks = () =>
         setTasks(prevTasks => prevTasks.filter(task => !task.completed))
-    }
+
+    const completedTasksCount = tasks.reduce((n, t) => n + (t.completed ? 1 : 0), 0)
 
     return (
         <main className="app">
@@ -57,76 +49,25 @@ const Todo = () => {
             </header>
 
             <section className="card">
-                <form onSubmit={addTask} className="todo-form" autoComplete="off">
-                    <label className="sr-only" htmlFor="todo">New task</label>
-                    <input
-                        ref={inputRef}
-                        onChange={(e) => setText(e.target.value)}
-                        id="todo"
-                        className="input"
-                        placeholder="For example: learn useEffect"
-                        value={text}
-                    />
-                    <button
-                        className="btn btn--primary"
-                        type="submit"
-                        disabled={!text.trim()}
-                    >
-                        Add task
-                    </button>
-                </form>
+                <TodoForm onAdd={addTask} />
+                <TodoToolbar
+                    filter={filter}
+                    onFilterChange={setFilter}
+                    onClearCompleted={removeCompletedTasks}
+                    canClearCompleted={completedTasksCount > 0}
+                />
 
-                <div className="toolbar">
-                    <div className="filters" role="tablist" aria-label="Фильтр">
-                        <button
-                            onClick={() => setFilter('all')}
-                            className={`chip ${filter === "all" ? "chip--active" : ""}`}
-                            type="button"
-                        >
-                            All
-                        </button>
-                        <button
-                            onClick={() => setFilter('active')}
-                            className={`chip ${filter === "active" ? "chip--active" : ""}`}
-                            type="button"
-                        >
-                            Active
-                        </button>
-                        <button
-                            onClick={() => setFilter('completed')}
-                            className={`chip ${filter === "completed" ? "chip--active" : ""}`}
-                            type="button"
-                        >
-                            Completed
-                        </button>
-                    </div>
-
-                    <button
-                        onClick={removeCompletedTasks}
-                        className="btn btn--ghost"
-                        type="button"
-                        disabled={completedTasks.length === 0}
-                    >
-                        Clear completed
-                    </button>
-                </div>
-
-                <ul className="list" aria-label="Tasks list">
-                    {filteredTasks.map(task => {
-                        return <TaskItem
-                            key={task.id}
-                            task={task}
-                            onDelete={removeTaskFromList}
-                            onChange={toggleTaskStatus}
-                        />
-                    })}
-                </ul>
-
-                {!filteredTasks.length ? <EmptyList/> : null}
+                <TodoTaskList
+                    tasks={tasks}
+                    filter={filter}
+                    filteredTasks={filteredTasks}
+                    onToggle={toggleTaskStatus}
+                    onDelete={removeTaskFromList}
+                />
 
                 <Footer
                     totalTasks={tasks.length}
-                    completedTasks={completedTasks.length}
+                    completedTasks={completedTasksCount}
                 />
             </section>
         </main>

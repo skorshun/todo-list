@@ -70,7 +70,7 @@ const Todo = () => {
                     <button
                         className="btn btn--primary"
                         type="submit"
-                        disabled={!text}
+                        disabled={!text.trim()}
                     >
                         Add task
                     </button>

@@ -16,12 +16,14 @@ const Todo = () => {
         return true;
     })
 
-    const addTask = () => {
+    const addTask = (e) => {
+        e.preventDefault()
+        const value = text.trim()
 
-        if (text) {
+        if (value) {
             setTasks(prev => [...prev, {
                 id: crypto.randomUUID(),
-                text: text,
+                text: value,
                 completed: false
             }])
 
@@ -55,7 +57,7 @@ const Todo = () => {
             </header>
 
             <section className="card">
-                <form className="todo-form" autoComplete="off">
+                <form onSubmit={addTask} className="todo-form" autoComplete="off">
                     <label className="sr-only" htmlFor="todo">New task</label>
                     <input
                         ref={inputRef}
@@ -66,9 +68,8 @@ const Todo = () => {
                         value={text}
                     />
                     <button
-                        onClick={() => addTask()}
                         className="btn btn--primary"
-                        type="button"
+                        type="submit"
                         disabled={!text}
                     >
                         Add task
